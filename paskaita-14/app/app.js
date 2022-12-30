@@ -1,5 +1,5 @@
 const cors = require('cors');
-const mysql = require('mysql2/promise');//kad galėtume dirbti su promise
+const mysql = require('mysql2');//lieka tik mysql2
 
 const express = require('express');
 const app = express();
@@ -7,33 +7,44 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-//susikuriame Config, kad turėtume ryšį su duomenų baze:
 const mysqlConfig = {
     host: '127.0.0.1',//local host
     user: 'root',
     password: 'Bartaseviciute1969',
-    database: 'codeacademy',//db prie kurios jungiamės
+    database: 'codeacademy',
     port: 3306
 };
+//išsikeliame config, panaikiname async ir await
+//naudojame call back
+const connection = mysql.createConnection(mysqlConfig);
 
-//susikuriame endpoint, kad galėtume jungtis prie duomenų bazės
-//kadangi tai yra asinchroninis veiksmas, norėsime, kad truputį palauktų
-//todėl naudosime async ir await:
-app.get('/students', async (req, res) => {
-    //grąžina patį "connection", į kurį paduosime querry
-    //guerry grąžins mums rezultatą,- visus students
-    //jungiamės prie duomenų baės:
-    const connection = await mysql.createConnection(mysqlConfig);
-    //pasakome iš kokios lentelės ką paimti ir ką gražinti
-    //priskiriame kintamajam students
-    //tai taip pat yra asinchroninis veiksmas:
-    const result = connection.execute('SELECT * FROM students');//SQL
-    const students = result[0];
-    //pasiloginame:
-    console.log(students);//matysime konsolėje
-    //grąžiname response:
-    res.send(students);//kad nepakibtų responsas, turime kažką gražinti
-    //užklausas, kad matytume, darome per Postman
+app.get('/students', (req, res) => {
+    const result = connection.execute('SELECT * FROM students', (err, students) => {
+        console.log(students);
+        res.send(students);
+    });
+});
+
+app.get('/assignments', (req, res) => {
+    const result = connection.execute('SELECT * FROM assignments', (err, assignments) => {
+        console.log(assignments);
+        res.send(assignments);
+    });
+});
+
+app.get('/assignments/done', (req, res) => {
+    const result = connection.execute('SELECT * FROM assignments WHERE done=1', (err, doneAssignments) => {
+        console.log(doneAssignments);
+        res.send(doneAssignments);
+    });
+});
+
+app.get('/assignments/notdone', (req, res) => {
+    
+    const result = connection.execute('SELECT * FROM assignments WHERE done=0', (err, notdoneAssignments) => {
+        console.log(notdoneAssignments);
+        res.send(notdoneAssignments);
+    });
 });
 
 const PORT = 3000;
