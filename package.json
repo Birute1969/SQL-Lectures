@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "start-14": "nodemon paskaita-14/app/app.js"
+    "start-14": "nodemon paskaita-14/app/app.js",
+    "start-15": "nodemon paskaita-15/app/app.js"
   },
   "keywords": [],
   "author": "",
